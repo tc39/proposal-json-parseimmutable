@@ -9,6 +9,8 @@ stage: 2
 contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo
 </pre>
 
+<emu-biblio href="./biblio.json"></emu-biblio>
+
 <emu-clause id="sec-structured-data">
   <h1>Structured Data</h1>
 
@@ -98,7 +100,7 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo
                 1. Assert: Type(_newElement_) is not Object.
                 1. Append _newElement_ to _items_.
                 1. Set _I_ to _I_ + 1.
-              1. Let _immutable_ be a new Tuple value whose [[Sequence]] is _items_.
+              1. Let _immutable_ be a new <emu-xref href="#sec-tuple-value">Tuple value</emu-xref> whose [[Sequence]] is _items_.
             1. Else,
               1. Let _props_ be ? EnumerableOwnPropertyNames(_obj_, ~key+value~).
               1. Let _fields_ be a new empty List.

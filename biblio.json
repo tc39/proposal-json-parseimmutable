@@ -1,0 +1,50 @@
+{
+  "location": "https://tc39.es/proposal-record-tuple/",
+  "entries": [
+    {
+      "type": "op",
+      "aoid": "CreateRecord",
+      "refId": "sec-createrecord",
+      "kind": "abstract operation",
+      "signature": {
+        "parameters": [
+          {
+            "name": "_entries_",
+            "type": {
+              "kind": "list",
+              "elements": {
+                "kind": "record",
+                "fields": {
+                  "[[Key]]": { "kind": "opaque", "type": "a String" },
+                  "[[Value]]": {
+                    "kind": "opaque",
+                    "type": "an ECMAScript language value"
+                  }
+                }
+              }
+            }
+          }
+        ],
+        "optionalParameters": [],
+        "return": null
+      },
+      "effects": []
+    },
+    {
+      "type": "clause",
+      "id": "sec-createrecord",
+      "aoid": "CreateRecord",
+      "title": "CreateRecord ( entries )",
+      "titleHTML": "<ins>CreateRecord ( <var>entries</var> )</ins>",
+      "number": "3.3.1"
+    },
+    {
+      "type": "clause",
+      "id": "sec-tuple-value",
+      "aoid": null,
+      "title": "Tuple value",
+      "titleHTML": "Tuple value",
+      "number": "1.2.4"
+    }
+  ]
+}
