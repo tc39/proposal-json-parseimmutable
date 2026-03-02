@@ -6,10 +6,10 @@ Stage 2
 
 **Champions:**
 
-- Robin Ricard (Bloomberg)
 - Rick Button (Bloomberg)
 - Nicolò Ribaudo (Igalia)
 - Ashley Claymore (Bloomberg)
+- Peter Klecha (Bloomberg)
 
 ## Overview
 
