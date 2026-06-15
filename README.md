@@ -20,7 +20,7 @@ assert(Object.isFrozen(obj));
 assert(Object.isFrozen(obj.one));
 ```
 
-A similar result can now only be achieved by use of a reviver:
+To achieve a similar result today a reviver can be used:
 
 ```javascript
 JSON.parse(data, (key, value) => {
