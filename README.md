@@ -23,12 +23,7 @@ assert(Object.isFrozen(obj.one));
 To achieve a similar result today a reviver can be used:
 
 ```javascript
-JSON.parse(data, (key, value) => {
-  if (typeof value === 'object' && value !== null) {
-      return Object.freeze(value);
-  }
-  return value;
-});
+JSON.parse(data, (key, value) => Object.freeze(value));
 ```
 
 ## History
