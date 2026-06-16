@@ -26,6 +26,8 @@ To achieve a similar result today a reviver can be used:
 JSON.parse(data, (key, value) => Object.freeze(value));
 ```
 
+But a native implementation could be much faster than a reviver-based implementation, and static analysis would greatly benfit from the knowledge that the result of `JSON.parseImmutable` is always deeply frozen.
+
 ## History
 
 This proposal was originally part of the [Records and Tuples Proposal][rec-tup-proposal] but split off into a separate proposal to reduce the scope of the core Records and Tuples proposal. [#330](https://github.com/tc39/proposal-record-tuple/issues/330). At this point the proposal was that the `JSON.parseImmutable` function would return a Record or a Tuple, those being the two types proposed by the Records and Tuples Proposal. The Records and Tuples Proposal was withdrawn, requiring a change of scope for this proposal.
