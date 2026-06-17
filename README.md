@@ -6,37 +6,33 @@ Stage 2
 
 **Champions:**
 
-- Rick Button (Bloomberg)
 - Nicolò Ribaudo (Igalia)
 - Ashley Claymore (Bloomberg)
 - Peter Klecha (Bloomberg)
 
 ## Overview
 
-This proposal complements the [Records and Tuples Proposal][rec-tup-proposal].
-It was originally part of that proposal but split off into a separate proposal to reduce the scope of the core Records and Tuples proposal. [#330](https://github.com/tc39/proposal-record-tuple/issues/330)
-
-The problem being explored is ergonomic and efficient creation of a deeply immutable data structure from a [JSON][json-mdn] string.
+This proposal identifies a need in ECMAScript for a function which parses [JSON][json-mdn] strings but returns deeply immutable objects. The current state of the proposal is to add a `JSON.parseImmutable` function to the specification which takes a string and optionally a reviver function, and returns an object which is deeply frozen, i.e., an object which is configured as if [`Object.freeze`][object-freeze-mdn] had been recursively called on it.
 
 ```javascript
-JSON.parse(data, (key, value) => {
-  if (typeof value === 'object' && value !== null) {
-      if (Array.isArray(value)) {
-        return Tuple.from(value);
-      } else {
-        return Record(value);
-      }
-  }
-  return value;
-});
+const obj = JSON.parseImmutable('{ "one": { "two": 3 } }');
+assert(Object.isFrozen(obj));
+assert(Object.isFrozen(obj.one));
 ```
 
-Could be replaced with:
+To achieve a similar result today a reviver can be used:
 
 ```javascript
-JSON.parseImmutable(data);
+JSON.parse(data, (key, value) => Object.freeze(value));
 ```
+
+But a native implementation could be much faster than a reviver-based implementation, and static analysis would greatly benfit from the knowledge that the result of `JSON.parseImmutable` is always deeply frozen.
+
+## History
+
+This proposal was originally part of the [Records and Tuples Proposal][rec-tup-proposal] but split off into a separate proposal to reduce the scope of the core Records and Tuples proposal. [#330](https://github.com/tc39/proposal-record-tuple/issues/330). At this point the proposal was that the `JSON.parseImmutable` function would return a Record or a Tuple, those being the two types proposed by the Records and Tuples Proposal. The Records and Tuples Proposal was withdrawn, requiring a change of scope for this proposal.
 
 <!-- References -->
 [rec-tup-proposal]: https://github.com/tc39/proposal-record-tuple
 [json-mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON
+[object-freeze-mdn]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
