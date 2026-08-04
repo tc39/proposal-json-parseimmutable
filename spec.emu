@@ -11,67 +11,29 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
 
 <emu-biblio href="./biblio.json"></emu-biblio>
 
-<emu-clause id="sec-ecmascript-language-expressions" number="13">
-  <h1>ECMAScript Language: Expressions</h1>
-  <emu-clause id="sec-primary-expression" number="2">
-    <h1>Primary Expression</h1>
-    <emu-clause id="sec-object-initializer" number="5">
-      <h1>Object Initializer</h1>
-      <emu-clause id="sec-runtime-semantics-propertydefinitionevaluation" oldids="sec-object-initializer-runtime-semantics-propertydefinitionevaluation" type="sdo" number="6">
-        <h1>
-          Runtime Semantics: PropertyDefinitionEvaluation (
-            _obj_: an Object,
-          ): either a normal completion containing ~unused~ or an abrupt completion
-        </h1>
-        <dl class="header">
-        </dl>
-        <emu-grammar>PropertyDefinition : PropertyName `:` AssignmentExpression</emu-grammar>
-        <emu-alg>
-          1. Let _propertyKey_ be ? Evaluation of |PropertyName|.
-          1. <del>If this |PropertyDefinition| is contained within a |Script| that is being evaluated for ParseJSON (see step <emu-xref href="#step-json-parse-eval"></emu-xref> of ParseJSON), then</del>
-            1. <del>Let _isProtoSetter_ be *false*.</del>
-          1. If <del>Else if</del> _propertyKey_ is *"__proto__"* and IsComputedPropertyKey of |PropertyName| is *false*, then
-            1. Let _isProtoSetter_ be *true*.
-          1. Else,
-            1. Let _isProtoSetter_ be *false*.
-          1. If IsAnonymousFunctionDefinition(|AssignmentExpression|) is *true* and _isProtoSetter_ is *false*, then
-            1. Let _propertyValue_ be ? NamedEvaluation of |AssignmentExpression| with argument _propertyKey_.
-          1. Else,
-            1. Let _exprValueRef_ be ? Evaluation of |AssignmentExpression|.
-            1. Let _propertyValue_ be ? GetValue(_exprValueRef_).
-          1. If _isProtoSetter_ is *true*, then
-            1. If _propertyValue_ is an Object or _propertyValue_ is *null*, then
-              1. Perform ! <emu-meta effects="user-code">_obj_.[[SetPrototypeOf]](_propertyValue_)</emu-meta>.
-            1. Return ~unused~.
-          1. Assert: _obj_ is an ordinary, extensible object with no non-configurable properties.
-          1. Perform ! CreateDataPropertyOrThrow(_obj_, _propertyKey_, _propertyValue_).
-          1. Return ~unused~.
-        </emu-alg>
-      </emu-clause>
-    </emu-clause>
-  </emu-clause>
-</emu-clause>
-
 <emu-clause id="sec-structured-data" number="25">
   <h1>Structured Data</h1>
 
   <emu-clause id="sec-json-object" number="5">
     <h1>The JSON Object</h1>
 
-    <emu-clause id="sec-json.parse" number="2">
+    <emu-clause id="sec-json.parse" type="built-in function">
       <h1>JSON.parse ( _text_ [ , _reviver_ ] )</h1>
       <p>This function parses a JSON text (a JSON-formatted String) and produces an ECMAScript language value. The JSON format represents literals, arrays, and objects with a syntax similar to the syntax for ECMAScript literals, Array Initializers, and Object Initializers. After parsing, JSON objects are realized as ECMAScript objects. JSON arrays are realized as ECMAScript Array instances. JSON strings, numbers, booleans, and null are realized as ECMAScript Strings, Numbers, Booleans, and *null*.</p>
       <p>The optional _reviver_ parameter is <ins>either</ins> a function that can filter and transform the results<ins>, or an options bag configuring native transforms</ins>. <del>F</del><ins>When _reviver_ is a function, f</ins>or each value produced by the parse, _reviver_ is called with three arguments (the associated property key, the value, and a context object). If the property is unmodified and its value is primitive, the provided context object has a *"source"* property containing source text of the corresponding Parse Node. If the call returns *undefined*, the property is deleted. Otherwise, the property is redefined to use the return value.</p>
       <emu-alg>
         1. Let _jsonString_ be ? ToString(_text_).
-        1. Let _parseResult_ be ? ParseJSON(_jsonString_<ins>, _reviver_</ins>).
-        1. Let _unfiltered_ be _parseResult_.[[Value]].
-        1. If IsCallable(_reviver_) is *false*, return _unfiltered_.
+        1. <ins>Let _options_ be CreateJSONParseOptionsRecord(_reviver_)</ins>.
+        1. <del>Let _deep_ be IsCallable(_reviver_)</del>.
+        1. <del>If _deep_ is *false*, then</del>
+          1. <del>Let _parseResult_ be ? ParseJSON(_jsonString_, ~discard-nodes~)</del>.
+          1. <del>Return _parseResult_.[[Value]]</del>.
+        1. Let _parseResult_ be ? ParseJSON(_jsonString_, <del>~keep-nodes~</del><ins>_options_</ins>).
+        1. <ins>If _options_.[[DeepNodes]] is ~discard-nodes~, return _parseResult_.[[Value]]</ins>.
+        1. <ins>Let _rootName_ be _parseResult_.[[Key]]</ins>.
         1. Let _root_ be OrdinaryObjectCreate(%Object.prototype%).
-        1. Let _rootName_ be the empty String.
-        1. Perform ! CreateDataPropertyOrThrow(_root_, _rootName_, _unfiltered_).
-        1. Let _snapshot_ be <emu-meta suppress-effects="user-code">CreateJSONParseRecord(_parseResult_.[[ParseNode]], _rootName_, _unfiltered_)</emu-meta>.
-        1. Return ? InternalizeJSONProperty(_root_, _rootName_, _reviver_, _snapshot_).
+        1. Perform ! CreateDataPropertyOrThrow(_root_, _rootName_, _parseResult_.[[Value]]).
+        1. Return ? InternalizeJSONProperty(_root_, _rootName_, _reviver_, _parseResult_).
       </emu-alg>
       <p>The *"length"* property of this function is *2*<sub>𝔽</sub>.</p>
 
@@ -79,29 +41,27 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
         <h1>
           ParseJSON (
             _text_: a String,
-            <ins>optional _reviver_: an ECMAScript language value,</ins>
-          ): either a normal completion containing a Record with fields [[ParseNode]] (a Parse Node) and [[Value]] (an ECMAScript language value), or a throw completion
+            <del>_deepNodes_: ~discard-nodes~ or ~keep-nodes~,</del>
+            <ins>_options_: a JSON Parse Options Record,</ins>
+          ): either a normal completion containing a JSON Parse Record, or a throw completion
         </h1>
         <dl class="header">
         </dl>
+        <emu-note>
+          <p>This algorithm references the |JSONValue| nonterminal from ECMA-404.</p>
+        </emu-note>
         <emu-alg>
-          1. <ins>Let _options_ be ? <emu-meta suppress-effects="user-code">CreateJSONParseOptions(_reviver_)</emu-meta>.</ins>
-          1. [id="step-json-parse-validate"] If StringToCodePoints(_text_) is not a valid JSON text as specified in ECMA-404, throw a *SyntaxError* exception.
-          1. Let _scriptString_ be the string-concatenation of *"("*, _text_, and *");"*.
-          1. [id="step-json-parse-parse"] Let _script_ be ParseText(_scriptString_, |Script|).
-          1. NOTE: The early error rules defined in <emu-xref href="#sec-object-initializer-static-semantics-early-errors"></emu-xref> have special handling for the above invocation of ParseText.
-          1. Assert: _script_ is a Parse Node.
-          1. <ins>Let _jsonParseNode_ be ShallowestContainedJSONValue(_script_).</ins>
-          1. <ins>Assert: _jsonParseNode_ is not ~empty~.</ins>
-          1. [id="step-json-parse-eval"] Let _result_ be <del>? <emu-meta suppress-effects="user-code">Evaluation of _script_</emu-meta></del><ins>? <emu-meta suppress-effects="user-code">JSONEvaluation of _jsonParseNode_ with argument _options_</emu-meta></ins>.
-          1. <del>NOTE: The PropertyDefinitionEvaluation semantics defined in <emu-xref href="#sec-runtime-semantics-propertydefinitionevaluation"></emu-xref> have special handling for the above evaluation.</del>
-          1. [id="step-json-parse-assert-type"] Assert: _result_ is either a String, a Number, a Boolean, an Object that is defined by either an |ArrayLiteral| or an |ObjectLiteral|, or *null*.
-          1. Return the Record { [[ParseNode]]: _script_, [[Value]]: _result_ }.
+          1. If StringToCodePoints(_text_) is not a valid JSON text as specified in ECMA-404, throw a *SyntaxError* exception.
+          1. NOTE: JSON whitespace is a strict subset of |WhiteSpace|, and JSON syntax does not support comments.
+          1. Let _jsonParseNode_ be ParseText(_text_, |JSONValue|).
+          1. If _jsonParseNode_ is not a Parse Node, throw a *SyntaxError* exception.
+          1. Let _key_ be the empty String.
+          1. Let _result_ be the JSONEvaluation of _jsonParseNode_ with arguments _key_ and <del>_deepNodes_</del><ins>_options_</ins>.
+          1. Return _result_.
         </emu-alg>
         <p>It is not permitted for a conforming implementation of `JSON.parse` to extend the JSON grammars. If an implementation wishes to support a modified or extended JSON interchange format it must do so by defining a different parse function.</p>
         <emu-note>
-          <p>Valid JSON text is a subset of the ECMAScript |PrimaryExpression| syntax. Step <emu-xref href="#step-json-parse-validate"></emu-xref> verifies that _jsonString_ conforms to that subset, and step <emu-xref href="#step-json-parse-assert-type"></emu-xref> asserts that evaluation returns a value of an appropriate type.</p>
-          <p>However, because <del><emu-xref href="#sec-runtime-semantics-propertydefinitionevaluation"></emu-xref></del><ins>JSONEvaluation</ins> behaves differently <del>during ParseJSON</del><ins>than Evaluation</ins>, the same source text can produce different results when evaluated as a |PrimaryExpression| rather than as JSON. Furthermore, the Early Error for duplicate *"__proto__"* properties in object literals, which likewise does not apply during ParseJSON, means that not all texts accepted by ParseJSON are valid as a |PrimaryExpression|, despite matching the grammar.</p>
+          <p>Valid JSON text is a syntactic subset of the ECMAScript |PrimaryExpression| syntax. However, because JSONEvaluation behaves differently than Evaluation, the same source text can produce different results when evaluated as a |PrimaryExpression| rather than as JSON. Furthermore, the early error for duplicate *"__proto__"* properties in object literals (<emu-xref href="#sec-object-initializer-static-semantics-early-errors"></emu-xref>), which has no analogue in JSON, means that some texts accepted by ParseJSON are not valid as a |PrimaryExpression|, (e.g., <code>{"__proto__":null,"__proto__":null}</code>).</p>
         </emu-note>
         <emu-note>
           <p>In the case where there are duplicate name Strings within an object, lexically preceding values for the same key shall be overwritten.</p>
@@ -117,6 +77,11 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
               <th>Meaning</th>
             </tr>
           </thead>
+          <tr>
+            <td>[[DeepNodes]]</td>
+            <td>~keep-nodes~ or ~discard-nodes~</td>
+            <td>Whether to preserve parse nodes for application to a reviver function.</td>
+          </tr>
           <tr>
             <td>[[Freeze]]</td>
             <td>a Boolean</td>
@@ -134,172 +99,138 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
         <h1>
           <ins>
             CreateJSONParseOptions (
-              _options_: an ECMAScript language value
+              optional _options_: an ECMAScript language value
             ): either a normal completion containing a JSON Parse Options Record or a throw completion
           </ins>
         </h1>
         <dl class="header">
         </dl>
         <emu-alg>
-          1. Let _record_ be a JSON Parse Options Record.
-          1. Set _record_.[[Freeze]] to *false*.
-          1. Set _record_.[[PreferNullPrototype]] to *false*.
-          1. If _options_ is not an Object, return _record_.
-          1. If IsCallable(_options_), return _record_.
-          1. Let _preferNullPrototype_ be *undefined*.
-          1. If _options_ ? <emu-meta suppress-effects="user-code">HasProperty(_options_, *"freeze"*)</emu-meta>, then
-            1. Let _freeze_ be ? <emu-meta suppress-effects="user-code">Get(_options_, *"freeze"*)</emu-meta>.
-            1. If _freeze_ is not a Boolean and _freeze_ is not *undefined*, throw a *TypeError* exception.
-            1. If _freeze_ is *true*, set _record_.[[Freeze]] to *true*.
-          1. If _options_ ? <emu-meta suppress-effects="user-code">HasProperty(_options_, *"preferNullPrototype"*)</emu-meta>, then
-            1. Set _preferNullPrototype_ to ? <emu-meta suppress-effects="user-code">Get(_options_, *"preferNullPrototype"*)</emu-meta>.
-            1. If _preferNullPrototype_ is not a Boolean and _preferNullPrototype_ is not *undefined*, throw a *TypeError* exception.
-            1. If _preferNullPrototype_ is *true*, set _record_.[[PreferNullPrototype]] to *true*.
-          1. If _freeze_ is *true* and _preferNullPrototype_ is *undefined*, set _record_.[[PreferNullPrototype]] to *true*.
-          1. Return _record_.
+          1. Let _freeze_ be *false*.
+          1. Let _preferNullPrototype_ be *false*.
+          1. Let _deepNodes_ be ~discard-nodes~.
+          1. If _options_ is an Object, then
+            1. If IsCallable(_options_), set _deepNodes_ to ~keep-nodes~.
+            1. Else,
+              1. Let _preferNullPrototypeChoice_ be *undefined*.
+              1. If _options_ ? <emu-meta suppress-effects="user-code">HasProperty(_options_, *"freeze"*)</emu-meta>, then
+                1. Let _freezeChoice_ be ? <emu-meta suppress-effects="user-code">Get(_options_, *"freeze"*)</emu-meta>.
+                1. If _freezeChoice_ is not a Boolean and _freezeChoice_ is not *undefined*, throw a *TypeError* exception.
+                1. If _freezeChoice_ is *true*, set _freeze_ to *true*.
+              1. If _options_ ? <emu-meta suppress-effects="user-code">HasProperty(_options_, *"preferNullPrototype"*)</emu-meta>, then
+                1. Set _preferNullPrototypeChoice_ to ? <emu-meta suppress-effects="user-code">Get(_options_, *"preferNullPrototype"*)</emu-meta>.
+                1. If _preferNullPrototypeChoice_ is not a Boolean and _preferNullPrototypeChoice_ is not *undefined*, throw a *TypeError* exception.
+                1. If _preferNullPrototypeChoice_ is *true*, set _preferNullPrototype_ to *true*.
+              1. If _freeze_ is *true* and _preferNullPrototype_ is *undefined*, set _preferNullPrototype_ to *true*.
+          1. Return the JSON Parse Options Record { [[DeepNodes]]: _deepNodes_, [[Freeze]]: _freeze_, [[PreferNullPrototype]]: _preferNullPrototype_ }.
         </emu-alg>
       </emu-clause>
 
-      <emu-clause id="sec-evaluatejson" type="sdo">
-        <h1><ins>Runtime Semantics: JSONEvaluation (
-            _options_: a JSON Parse Options Record
-          ): either a normal completion containing an ECMAScript language value or a throw completion
-          </ins>
+      <emu-clause id="sec-jsonevaluation" type="sdo" oldids="sec-createjsonparserecord,sec-shallowestcontainedjsonvalue">
+        <h1>
+          Runtime Semantics: JSONEvaluation (
+            _key_: a property key,
+            <del>_deepNodes_: ~discard-nodes~ or ~keep-nodes~,</del>
+            <ins>_options_: a JSON Parse Options Record,</ins>
+          ): a JSON Parse Record
         </h1>
         <dl class="header">
+          <dt>description</dt>
+          <dd>
+            <p>It generally produces the same values as Evaluation given the same inputs, but is defined over a much narrower set of productions, namely ECMA-404's |JSONValue|. Unlike Evaluation, it does not raise an early error when *"__proto__"* appears twice as a key (see <emu-xref href="#sec-object-initializer-static-semantics-early-errors"></emu-xref>). It also does not perform [[SetPrototypeOf]] when encountering a *"__proto__"* key, and instead creates an ordinary data property (see <emu-xref href="#sec-runtime-semantics-propertydefinitionevaluation"></emu-xref>).</p>
+          </dd>
         </dl>
-        <emu-grammar>
-        Literal :
-          NullLiteral
-          BooleanLiteral
-          NumericLiteral
-          StringLiteral
-        </emu-grammar>
-        <emu-alg>
-          1. Let _value_ be ! Evaluation of |Literal|.
-          1. Assert: _value_ is either a String, a Number, a Boolean, or *null*.
-          1. Return _value_.
-        </emu-alg>
 
         <emu-grammar>
-          ArrayLiteral : `[` ElementList `]`
+          JSONArray :
+            `[` `]`
+            `[` JSONElementList `]`
         </emu-grammar>
         <emu-alg>
           1. Let _array_ be ! ArrayCreate(0).
-          1. Perform ? JSONArrayAccumulation of |ElementList| with arguments _array_, 0, and _options_.
-          1. If _options_.[[Freeze]] is *true*, perform ! SetIntegrityLevel(_array_, ~frozen~).
-          1. Return _array_.
+          1. Let _elements_ be a new empty List.
+          1. If |JSONElementList| is present, perform JSONArrayAccumulation of |JSONElementList| with arguments _array_, <ins>_options_</ins><del>_deepNodes_</del>, _elements_, and 0.
+          1. <ins>If _options_.[[Freeze]] is *true*, perform ! SetIntegrityLevel(_array_, ~frozen~)</ins>.
+          1. Return the JSON Parse Record { [[ParseNode]]: |JSONArray|, [[Key]]: _key_, [[Value]]: _array_, [[Elements]]: _elements_, [[Entries]]: « » }.
         </emu-alg>
 
         <emu-grammar>
-          ObjectLiteral : `{` `}`
+          JSONObject :
+            `{` `}`
+            `{` JSONMemberList `}`
         </emu-grammar>
         <emu-alg>
-          1. If _preferNullPrototype_ is *true*, then
-            1. Let _obj_ be OrdinaryObjectCreate(*null*).
-          1. Else,
-            1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%).
-          1. If _options_.[[Freeze]] is *true*, perform ! SetIntegrityLevel(_obj_, ~frozen~).
-          1. Return _obj_.
-        </emu-alg>
-
-        <emu-grammar>
-          ObjectLiteral : `{` PropertyDefinitionList `}`
-        </emu-grammar>
-        <emu-alg>
-          1. If _options_.[[PreferNullPrototype]] is *true*, then
-            1. Let _obj_ be OrdinaryObjectCreate(*null*).
-          1. Else,
-            1. Let _obj_ be OrdinaryObjectCreate(%Object.prototype%).
-          1. Perform ? JSONPropertyDefinitionEvaluation of |PropertyDefinitionList| with arguments _obj_ and _options_.
-          1. If _options_.[[Freeze]] is *true*, perform ! SetIntegrityLevel(_obj_, ~frozen~).
-          1. Return _obj_.
+          1. <del>Let _obj_ be OrdinaryObjectCreate(%Object.prototype%)</del>.
+          1. <ins>If _options_.[[PreferNullPrototype]] is *true*, then</ins>
+            1. <ins>Let _obj_ be OrdinaryObjectCreate(*null*)</ins>.
+          1. <ins>Else,</ins>
+            1. <ins>Let _obj_ be OrdinaryObjectCreate(%Object.prototype%)</ins>.
+          1. Let _entries_ be a new empty List.
+          1. If |JSONMemberList| is present, perform JSONMemberListEvaluation of |JSONMemberList| with argument _obj_, <ins>_options_</ins><del>_deepNodes_</del>, and _entries_.
+          1. <ins>If _options_.[[Freeze]] is *true*, perform ! SetIntegrityLevel(_obj_, ~frozen~)</ins>.
+          1. Return the JSON Parse Record { [[ParseNode]]: |JSONObject|, [[Key]]: _key_, [[Value]]: _obj_, [[Elements]]: « », [[Entries]]: _entries_ }.
         </emu-alg>
       </emu-clause>
 
       <emu-clause id="sec-jsonarrayaccumulation" type="sdo">
         <h1>
-          <ins>
-            Runtime Semantics: JSONArrayAccumulation (
-              _array_: an Array,
-              _nextIndex_: an integer,
-              _options_: a JSON Parse Options Record,
-            ): a Completion Record
-          </ins>
+          Runtime Semantics: JSONArrayAccumulation (
+            _array_: an Array,
+            <del>_deepNodes_: ~discard-nodes~ or ~keep-nodes~,</del>
+            <ins>_options_: a JSON Parse Options Record,</ins>
+            _elements_: a List of JSON Parse Records,
+            _nextIndex_: a non-negative integer,
+          ): a non-negative integer
         </h1>
         <dl class="header">
+          <dt>description</dt>
+          <dd>It is analagous to ArrayAccumulation, except defined over a much narrower grammar (namely ECMA-404), and calls JSONEvaluation on its elements, rather than Evaluation.</dd>
         </dl>
-        <emu-grammar>ElementList : Elision? AssignmentExpression</emu-grammar>
+        <emu-grammar>
+          JSONElementList :
+            JSONValue
+            JSONElementList `,` JSONValue
+        </emu-grammar>
         <emu-alg>
-          1. Assert: |Elision| is not present.
-          1. Let _node_ be ShallowestContainedJSONValue(|AssignmentExpression|).
-          1. Assert: _node_ is not ~empty~.
-          1. Let _result_ be ? JSONEvaluation of _node_ with argument _options_.
-          1. Perform ! CreateDataPropertyOrThrow(_array_, ! ToString(𝔽(_nextIndex_)), _result_).
+          1. If the derived |JSONElementList| is present, set _nextIndex_ to the JSONArrayAccumulation of the derived |JSONElementList| with arguments _array_, <ins>_options_</ins><del>_deepNodes_</del>, _elements_, and _nextIndex_.
+          1. Let _key_ be ! ToString(𝔽(_nextIndex_)).
+          1. Let _parseRecord_ be the JSONEvaluation of |JSONValue| with arguments _key_ and <ins>_options_</ins><del>_deepNodes_</del>.
+          1. Perform ! CreateDataPropertyOrThrow(_array_, _key_, _parseRecord_.[[Value]]).
+          1. If <ins>_options_.[[DeepNodes]]</ins><del>_deepNodes_</del> is ~keep-nodes~, append _parseRecord_ to _elements_.
           1. Return _nextIndex_ + 1.
-        </emu-alg>
-        <emu-grammar>ElementList : Elision? SpreadElement</emu-grammar>
-        <emu-alg>
-          1. NOTE: JSON text as specified in ECMA-404 does not include |SpreadElement|.
-          1. Assert: This step is never reached.
-        </emu-alg>
-        <emu-grammar>ElementList : ElementList `,` Elision? AssignmentExpression</emu-grammar>
-        <emu-alg>
-          1. Set _nextIndex_ to ? JSONArrayAccumulation of the derived |ElementList| with arguments _array_, _nextIndex_, and _options_.
-          1. Assert: |Elision| is not present.
-          1. Let _node_ be ShallowestContainedJSONValue(|AssignmentExpression|).
-          1. Assert: _node_ is not ~empty~.
-          1. Let _result_ be ? JSONEvaluation of _node_ with argument _options_.
-          1. Perform ! CreateDataPropertyOrThrow(_array_, ! ToString(𝔽(_nextIndex_)), _result_).
-          1. Return _nextIndex_ + 1.
-        </emu-alg>
-        <emu-grammar>ElementList : ElementList `,` Elision? SpreadElement</emu-grammar>
-        <emu-alg>
-          1. NOTE: JSON text as specified in ECMA-404 does not include |SpreadElement|.
-          1. Assert: This step is never reached.
         </emu-alg>
       </emu-clause>
 
-      <emu-clause id="sec-jsonpropertydefinitionevaluation" type="sdo">
-        <h1><ins>Runtime Semantics: JSONPropertyDefinitionEvaluation (
+      <emu-clause id="sec-jsonmemberlistevaluation" type="sdo">
+        <h1>
+          Runtime Semantics: JSONMemberListEvaluation (
             _obj_: an Object,
-            _options_: a JSON Parse Options Record,
-          ): either a normal completion containing ~unused~ or an abrupt completion
-          </ins>
+            <del>_deepNodes_: ~discard-nodes~ or ~keep-nodes~,</del>
+            <ins>_options_: a JSON Parse Options Record,</ins>
+            _entries_: a List of JSON Parse Records,
+          ): ~unused~
         </h1>
         <dl class="header">
+          <dt>description</dt>
+          <dd>It is analagous to PropertyDefinitionEvaluation, except 1) it is defined over a much narrower grammar, 2) it does not include the special handling of *"__proto__"* described in <emu-xref href="#sec-jsonevaluation"></emu-xref>, and 3) it calls JSONEvaluation instead of Evaluation.</dd>
         </dl>
-        <emu-grammar>PropertyDefinitionList : PropertyDefinitionList `,` PropertyDefinition</emu-grammar>
+        <emu-grammar>JSONMemberList : JSONMemberList `,` JSONMember</emu-grammar>
         <emu-alg>
-          1. Perform ? JSONPropertyDefinitionEvaluation of |PropertyDefinitionList| with arguments _obj_ and _options_.
-          1. Perform ? JSONPropertyDefinitionEvaluation of |PropertyDefinition| with arguments _obj_ and _options_.
+          1. Perform JSONMemberListEvaluation of the derived |JSONMemberList| with arguments _obj_, <ins>_options_</ins><del>_deepNodes_</del>, and _entries_.
+          1. Perform JSONMemberListEvaluation of |JSONMember| with arguments _obj_, <ins>_options_</ins><del>_deepNodes_</del>, and _entries_.
           1. Return ~unused~.
         </emu-alg>
-        <emu-grammar>PropertyDefinition : `...` AssignmentExpression</emu-grammar>
+        <emu-grammar>JSONMember : JSONString `:` JSONValue</emu-grammar>
         <emu-alg>
-          1. NOTE: JSON text as specified in ECMA-404 does not include `...`.
-          1. Assert: This step is never reached.
-        </emu-alg>
-        <emu-grammar>PropertyDefinition : IdentifierReference</emu-grammar>
-        <emu-alg>
-          1. NOTE: JSON text as specified in ECMA-404 does not include object shorthand notation.
-          1. Assert: This step is never reached.
-        </emu-alg>
-        <emu-grammar>PropertyDefinition : PropertyName `:` AssignmentExpression</emu-grammar>
-        <emu-alg>
-          1. Let _propertyKey_ be ? Evaluation of |PropertyName|.
-          1. Let _isProtoSetter_ be *false*.
-          1. Let _node_ be ShallowestContainedJSONValue(|AssignmentExpression|).
-          1. Assert: _node_ is not ~empty~.
-          1. Let _value_ be ? JSONEvaluation of _node_ with argument _options_.
+          1. Let _dummyKey_ be the empty String.
+          1. Let _propertyKeyRecord_ be the JSONEvaluation of |JSONString| with arguments _dummyKey_ and <ins>_options_</ins><del>_deepNodes_</del>.
+          1. Let _key_ be _propertyKeyRecord_.[[Value]].
+          1. Assert: _key_ is a property name.
+          1. Let _propertyValueRecord_ be the JSONEvaluation of |JSONValue| with arguments _key_ and <ins>_options_</ins><del>_deepNodes_</del>.
           1. Assert: _obj_ is an ordinary, extensible object with no non-configurable properties.
-          1. Perform ! CreateDataPropertyOrThrow(_obj_, _propertyKey_, _propertyValue_).
+          1. Perform ! CreateDataPropertyOrThrow(_obj_, _key_, _propertyValueRecord_.[[Value]]).
+          1. If <ins>_options_.[[DeepNodes]]</ins><del>_deepNodes_</del> is ~keep-nodes~, append _propertyValueRecord_ to _entries_.
           1. Return ~unused~.
-        </emu-alg>
-        <emu-grammar>PropertyDefinition : MethodDefinition</emu-grammar>
-        <emu-alg>
-          1. NOTE: JSON text as specified in ECMA-404 does not include |MethodDefinition|.
-          1. Assert: This step is never reached.
         </emu-alg>
       </emu-clause>
     </emu-clause>
