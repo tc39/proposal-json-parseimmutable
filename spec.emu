@@ -23,7 +23,7 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
       <p>The optional _reviver_ parameter is <ins>either</ins> a function that can filter and transform the results<ins>, or an options bag configuring native transforms</ins>. <del>F</del><ins>When _reviver_ is a function, f</ins>or each value produced by the parse, _reviver_ is called with three arguments (the associated property key, the value, and a context object). If the property is unmodified and its value is primitive, the provided context object has a *"source"* property containing source text of the corresponding Parse Node. If the call returns *undefined*, the property is deleted. Otherwise, the property is redefined to use the return value.</p>
       <emu-alg>
         1. Let _jsonString_ be ? ToString(_text_).
-        1. <ins>Let _options_ be CreateJSONParseOptions(_reviver_)</ins>.
+        1. <ins>Let _options_ be ? CreateJSONParseOptions(_reviver_)</ins>.
         1. Let _parseResult_ be ? ParseJSON(_jsonString_, <ins>_options_</ins>).
         1. If IsCallable(_reviver_) is *false*, return _parseResult_.[[Value]].
         1. Let _root_ be OrdinaryObjectCreate(%Object.prototype%).
