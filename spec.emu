@@ -14,6 +14,15 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
 <emu-clause id="sec-structured-data" number="25">
   <h1>Structured Data</h1>
 
+  <emu-note type="editor">
+    <p>This proposal builds on top of <a href="https://github.com/tc39/ecma262/pull/3933">ecma262 editorial PR #3933</a>, which introduces the following SDOs:</p>
+    <ul>
+      <li>JSONEvaluation</li>
+      <li>JSONArrayAccumulation</li>
+      <li>JSONMemberListEvaluation</li>
+    </ul>
+  </emu-note>
+
   <emu-clause id="sec-json-object" number="5">
     <h1>The JSON Object</h1>
 
@@ -64,7 +73,7 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
       </emu-clause>
 
       <emu-clause id="sec-json-parse-options-records">
-        <h1>JSON Parse Options Records</h1>
+        <h1><ins>JSON Parse Options Records</ins></h1>
         <p>A <dfn variants="JSON Parse Options Records">JSON Parse Options Record</dfn> is a Record value used to specify JSON deserialization options.</p>
         <p>JSON Parse Options Records have the fields listed in <emu-xref href="#table-json-parse-options-records"></emu-xref>.</p>
         <emu-table id="table-json-parse-options-records" caption="JSON Parse Options Record Fields">
