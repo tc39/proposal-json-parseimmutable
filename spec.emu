@@ -27,18 +27,18 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
     <h1>The JSON Object</h1>
 
     <emu-clause id="sec-json.parse" type="built-in function">
-      <h1>JSON.parse ( _text_ [ , <del>_reviver</del><ins>_reviverOrOptions_</ins> ] )</h1>
+      <h1>JSON.parse ( _text_ [ , _reviverOrOptions_ ] )</h1>
       <p>This function parses a JSON text (a JSON-formatted String) and produces an ECMAScript language value. The JSON format represents literals, arrays, and objects with a syntax similar to the syntax for ECMAScript literals, Array Initializers, and Object Initializers. After parsing, JSON objects are realized as ECMAScript objects. JSON arrays are realized as ECMAScript Array instances. JSON strings, numbers, booleans, and null are realized as ECMAScript Strings, Numbers, Booleans, and *null*.</p>
-      <p>The optional <del>_reviver</del><ins>_reviverOrOptions_</ins> parameter is <ins>either</ins> a function that can filter and transform the results<ins>, or an object whose entries specify built-in transforms to be applied</ins>. <del>F</del><ins>When _reviverOrOptions_ is a function, f</ins>or each value produced by the parse, <del>_reviver</del><ins>_reviverOrOptions_</ins> is called with three arguments (the associated property key, the value, and a context object). If the property is unmodified and its value is primitive, the provided context object has a *"source"* property containing source text of the corresponding Parse Node. If the call returns *undefined*, the property is deleted. Otherwise, the property is redefined to use the return value.</p>
+      <p>The optional <del>_reviver_</del><ins>_reviverOrOptions_</ins> parameter is <ins>either</ins> a function that can filter and transform the results<ins>, or an object whose entries specify built-in transforms to be applied</ins>. <del>F</del><ins>When _reviverOrOptions_ is a function, f</ins>or each value produced by the parse, <del>_reviver_</del><ins>_reviverOrOptions_</ins> is called with three arguments (the associated property key, the value, and a context object). If the property is unmodified and its value is primitive, the provided context object has a *"source"* property containing source text of the corresponding Parse Node. If the call returns *undefined*, the property is deleted. Otherwise, the property is redefined to use the return value.</p>
       <emu-alg>
         1. Let _jsonString_ be ? ToString(_text_).
         1. <ins>Let _options_ be ? CreateJSONParseOptions(_reviverOrOptions_)</ins>.
         1. Let _parseResult_ be ? ParseJSON(_jsonString_, <ins>_options_</ins>).
-        1. If IsCallable(<del>_reviver</del><ins>_reviverOrOptions_</ins>) is *false*, return _parseResult_.[[Value]].
+        1. If IsCallable(<del>_reviver_</del><ins>_reviverOrOptions_</ins>) is *false*, return _parseResult_.[[Value]].
         1. Let _root_ be OrdinaryObjectCreate(%Object.prototype%).
         1. Assert: _parseResult_.[[Key]] is the empty String.
         1. Perform ! CreateDataPropertyOrThrow(_root_, _parseResult_.[[Key]], _parseResult_.[[Value]]).
-        1. Return ? InternalizeJSONProperty(_root_, _parseResult_.[[Key]], <del>_reviver</del><ins>_reviverOrOptions_</ins>, _parseResult_).
+        1. Return ? InternalizeJSONProperty(_root_, _parseResult_.[[Key]], <del>_reviver_</del><ins>_reviverOrOptions_</ins>, _parseResult_).
       </emu-alg>
       <p>The *"length"* property of this function is *2*<sub>𝔽</sub>.</p>
 
@@ -60,7 +60,7 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
           1. Let _jsonParseNode_ be ParseText(_text_, |JSONValue|).
           1. If _jsonParseNode_ is not a Parse Node, throw a *SyntaxError* exception.
           1. Let _key_ be the empty String.
-          1. Let _result_ be the JSONEvaluation of _jsonParseNode_ with argument<ins>s</ins> _key_ <ins>and _options_</ins>.
+          1. Let _result_ be the JSONEvaluation of _jsonParseNode_<del> with argument _key_</del><ins> with arguments _key_ and _options_</ins>.
           1. Return _result_.
         </emu-alg>
         <p>It is not permitted for a conforming implementation of `JSON.parse` to extend the JSON grammars. If an implementation wishes to support a modified or extended JSON interchange format it must do so by defining a different parse function.</p>
@@ -189,7 +189,7 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
         <emu-alg>
           1. If the derived |JSONElementList| is present, set _nextIndex_ to the JSONArrayAccumulation of the derived |JSONElementList| with arguments _array_, <ins>_options_,</ins> _elements_, and _nextIndex_.
           1. Let _key_ be ! ToString(𝔽(_nextIndex_)).
-          1. Let _parseRecord_ be the JSONEvaluation of |JSONValue| with argument<ins>s</ins> _key_ <ins>and _options_</ins>.
+          1. Let _parseRecord_ be the JSONEvaluation of |JSONValue|<del> with argument _key_</del><ins> with arguments _key_ and _options_</ins>.
           1. Perform ! CreateDataPropertyOrThrow(_array_, _key_, _parseRecord_.[[Value]]).
           1. Append _parseRecord_ to _elements_.
           1. Return _nextIndex_ + 1.
@@ -210,17 +210,17 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
         </dl>
         <emu-grammar>JSONMemberList : JSONMemberList `,` JSONMember</emu-grammar>
         <emu-alg>
-          1. Perform JSONMemberListEvaluation of the derived |JSONMemberList| with arguments _obj_, <ins>_options_,</ins> and _entries_.
-          1. Perform JSONMemberListEvaluation of |JSONMember| with arguments _obj_, <ins>_options_,</ins> and _entries_.
+          1. Perform JSONMemberListEvaluation of the derived |JSONMemberList|<del> with arguments _obj_ and _entries_</del><ins> with arguments _obj_, _options_, and _entries_</ins>.
+          1. Perform JSONMemberListEvaluation of |JSONMember|<del> with arguments _obj_ and _entries_</del><ins> with arguments _obj_, _options_, and _entries_</ins>.
           1. Return ~unused~.
         </emu-alg>
         <emu-grammar>JSONMember : JSONString `:` JSONValue</emu-grammar>
         <emu-alg>
           1. Let _dummyKey_ be the empty String.
-          1. Let _propertyKeyRecord_ be the JSONEvaluation of |JSONString| with argument<ins>s</ins> _dummyKey_<ins> and _options_</ins>.
+          1. Let _propertyKeyRecord_ be the JSONEvaluation of |JSONString|<del> with argument _dummyKey_</del><ins> with arguments _dummyKey_ and _options_</ins>.
           1. Let _key_ be _propertyKeyRecord_.[[Value]].
           1. Assert: _key_ is a property name.
-          1. Let _propertyValueRecord_ be the JSONEvaluation of |JSONValue| with argument<ins>s</ins> _key_<ins> and _options_</ins>.
+          1. Let _propertyValueRecord_ be the JSONEvaluation of |JSONValue|<del> with argument _key_</del><ins> with arguments _key_ and _options_</ins>.
           1. Assert: _obj_ is an ordinary, extensible object with no non-configurable properties.
           1. Perform ! CreateDataPropertyOrThrow(_obj_, _key_, _propertyValueRecord_.[[Value]]).
           1. Append _propertyValueRecord_ to _entries_.
