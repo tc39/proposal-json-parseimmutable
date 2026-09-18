@@ -22,12 +22,6 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
       <li>JSONMemberListEvaluation</li>
     </ul>
   </emu-note>
-  <emu-note type="editor">
-    <p>This proposal builds on top of <a href="https://github.com/tc39/proposal-temporal">Temporal</a>, which introduces the following AO:</p>
-    <ul>
-      <li>GetOption</li>
-    </ul>
-  </emu-note>
 
   <emu-clause id="sec-json-object" number="5">
     <h1>The JSON Object</h1>
@@ -119,10 +113,12 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
           1. Let _freeze_ be *false*.
           1. Let _preferNullPrototype_ be *false*.
           1. If _options_ is an Object and IsCallable(_options_) is *false*, then
-            1. Let _freezeDefaultValue_ be *false*.
-            1. Set _freeze_ to ? <emu-meta suppress-effects="user-code">GetOption(_options_, *"freeze"*, ~BOOLEAN~, ~EMPTY~, _freezeDefaultValue_)</emu-meta>.
-            1. Let _preferNullPrototypeDefaultValue_ be _freeze_.
-            1. Set _preferNullPrototype_ to ? <emu-meta suppress-effects="user-code">GetOption(_options_, *"preferNullPrototype"*, ~BOOLEAN~, ~EMPTY~, _preferNullPrototypeDefaultValue_)</emu-meta>.
+            1. Set _freeze_ to ? Get(_options_, *"freeze"*).
+            1. If _freeze_ is *undefined*, set _freeze_ to *false*.
+            1. Else, set _freeze_ to ToBoolean(_freeze_).
+            1. Set _preferNullPrototype_ to ? Get(_options_, *"preferNullPrototype"*).
+            1. If _preferNullPrototype_ is *undefined*, set _preferNullPrototype_ to _freeze_.
+            1. Else, set _preferNullPrototype_ to ToBoolean(_preferNullPrototype_).
           1. Return the JSON Parse Options Record { [[Freeze]]: _freeze_, [[PreferNullPrototype]]: _preferNullPrototype_ }.
         </emu-alg>
       </emu-clause>
