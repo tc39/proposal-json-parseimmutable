@@ -113,12 +113,8 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
           1. Let _freeze_ be *false*.
           1. Let _preferNullPrototype_ be *false*.
           1. If _options_ is an Object and IsCallable(_options_) is *false*, then
-            1. Set _freeze_ to ? Get(_options_, *"freeze"*).
-            1. If _freeze_ is *undefined*, set _freeze_ to *false*.
-            1. If _freeze_ is not a Boolean, throw a *TypeError* exception.
-            1. Set _preferNullPrototype_ to ? Get(_options_, *"preferNullPrototype"*).
-            1. If _preferNullPrototype_ is *undefined*, set _preferNullPrototype_ to _freeze_.
-            1. If _preferNullPrototype_ is not a Boolean, throw a *TypeError* exception.
+            1. Set _freeze_ to ? GetBooleanOption(_options_, *"freeze"*, ~reject~, *false*).
+            1. Set _preferNullPrototype_ to ? GetBooleanOption(_options_, *"preferNullPrototype"*, ~reject~, _freeze_).
           1. Return the JSON Parse Options Record { [[Freeze]]: _freeze_, [[PreferNullPrototype]]: _preferNullPrototype_ }.
         </emu-alg>
       </emu-clause>
