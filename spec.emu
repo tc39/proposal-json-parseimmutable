@@ -125,7 +125,7 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
               <td>Whether objects (including arrays) should be frozen upon creation.</td>
             </tr>
             <tr>
-              <td>[[PreferNullPrototype]]</td>
+              <td>[[NullPrototypeObjects]]</td>
               <td>a Boolean</td>
               <td>Whether non-array objects should be created with a null prototype.</td>
             </tr>
@@ -145,11 +145,11 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
         </dl>
         <emu-alg>
           1. Let _freeze_ be *false*.
-          1. Let _preferNullPrototype_ be *false*.
+          1. Let _nullPrototypeObjects_ be *false*.
           1. If _options_ is an Object and IsCallable(_options_) is *false*, then
             1. Set _freeze_ to ? GetBooleanOption(_options_, *"freeze"*, ~reject~, *false*).
-            1. Set _preferNullPrototype_ to ? GetBooleanOption(_options_, *"preferNullPrototype"*, ~reject~, _freeze_).
-          1. Return the JSON Parse Options Record { [[Freeze]]: _freeze_, [[PreferNullPrototype]]: _preferNullPrototype_ }.
+            1. Set _nullPrototypeObjects_ to ? GetBooleanOption(_options_, *"nullPrototypeObjects"*, ~reject~, _freeze_).
+          1. Return the JSON Parse Options Record { [[Freeze]]: _freeze_, [[NullPrototypeObjects]]: _nullPrototypeObjects_ }.
         </emu-alg>
       </emu-clause>
 
@@ -187,7 +187,7 @@ contributors: Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter
         </emu-grammar>
         <emu-alg>
           1. <del>Let _obj_ be OrdinaryObjectCreate(%Object.prototype%)</del>.
-          1. <ins>If _options_.[[PreferNullPrototype]] is *true*, then</ins>
+          1. <ins>If _options_.[[NullPrototypeObjects]] is *true*, then</ins>
             1. <ins>Let _obj_ be OrdinaryObjectCreate(*null*)</ins>.
           1. <ins>Else,</ins>
             1. <ins>Let _obj_ be OrdinaryObjectCreate(%Object.prototype%)</ins>.
