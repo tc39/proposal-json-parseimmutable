@@ -1,17 +1,17 @@
 <!doctype html>
 <head><meta content="width=device-width,initial-scale=1" name=viewport><meta charset=utf-8><meta content=https://tc39.es/ecmarkup/ecma-logo.png property=og:image><meta content="JSON.parse Options" property=og:title><meta content="ECMAScript Language: Scripts and Modules
 
-  
+
     Modules
 
-    
+
       Module Semantics
 
-      
+
         Synthetic Module Records
 
-        
-          
+
+
             ParseJSONModule (
               _source_: a String,
             ): either a normal completion containing a Synthetic Module Record, or a" property=og:description>
@@ -123,7 +123,7 @@
               <td>Whether objects (including arrays) should be frozen upon creation.</td>
             </tr>
             <tr>
-              <td><var class=field>[[PreferNullPrototype]]</var></td>
+              <td><var class=field>[[NullPrototypeObjects]]</var></td>
               <td>a Boolean</td>
               <td>Whether non-array objects should be created with a null <emu-xref href=#prototype><a href=https://tc39.es/ecma262/#prototype>prototype</a></emu-xref>.</td>
             </tr>
@@ -141,7 +141,7 @@
         <h1><span class=secnum>25.5.1.4</span> Runtime Semantics: JSONEvaluation</h1>
         <p>The <emu-xref href=#sec-algorithm-conventions-syntax-directed-operations><a href=https://tc39.es/ecma262/#sec-algorithm-conventions-syntax-directed-operations>syntax-directed operation</a></emu-xref> JSONEvaluation takes arguments <var>key</var> (a <emu-xref href=#property-key><a href=https://tc39.es/ecma262/#property-key>property key</a></emu-xref>) and <ins><var>options</var> (a <emu-xref href=#sec-json-parse-options-records id=_ref_16><a href=#sec-json-parse-options-records>JSON Parse Options Record</a></emu-xref>)</ins> and returns a <emu-xref href=#sec-json-parse-record><a href=https://tc39.es/ecma262/#sec-json-parse-record>JSON Parse Record</a></emu-xref>.</p>
             <p>It generally produces the same values as <emu-xref aoid=Evaluation><a href=https://tc39.es/ecma262/#sec-evaluation>Evaluation</a></emu-xref> given the same inputs, but is defined over a much narrower set of productions, namely ECMA-404's <emu-nt><a href=https://tc39.es/ecma404/#prod-JSONValue>JSONValue</a></emu-nt>. Unlike <emu-xref aoid=Evaluation><a href=https://tc39.es/ecma262/#sec-evaluation>Evaluation</a></emu-xref>, it does not raise an <emu-xref href=#early-error><a href=https://tc39.es/ecma262/#early-error>early error</a></emu-xref> when <emu-val>"__proto__"</emu-val> appears twice as a key (see <emu-xref href=#sec-object-initializer-static-semantics-early-errors><a href=https://tc39.es/ecma262/#sec-object-initializer-static-semantics-early-errors>13.2.5.1</a></emu-xref>). It also does not perform <var class=field>[[SetPrototypeOf]]</var> when encountering a <emu-val>"__proto__"</emu-val> key, and instead creates an ordinary <emu-xref href=#sec-object-type><a href=https://tc39.es/ecma262/#sec-object-type>data property</a></emu-xref> (see <emu-xref href=#sec-runtime-semantics-propertydefinitionevaluation><a href=https://tc39.es/ecma262/#sec-runtime-semantics-propertydefinitionevaluation>13.2.5.6</a></emu-xref>).</p>
-          
+
 
         <p>It is defined piecewise over the following productions:</p>
 
@@ -223,7 +223,7 @@
   </emu-clause>
 </emu-clause><emu-annex back-matter="" id=sec-copyright-and-software-license>
         <h1>Copyright & Software License</h1>
-        
+
         <div id=copyright-notice class=copyright-notice><h2>Copyright Notice</h2>
 <p>© 2026 Robin Ricard, Rick Button, Ashley Claymore, Nicolò Ribaudo, Peter Klecha</p>
 </div>
